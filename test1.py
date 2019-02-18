@@ -9,6 +9,7 @@ topology enables one to pass in '--topo=mytopo' from the command line.
 """
 
 from mininet.topo import Topo
+from mininet.link import TCLink
 
 class MyTopo( Topo ):
     "Simple topology example."
