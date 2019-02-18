@@ -1,1 +1,1 @@
-sudo mn --custom test1.py --topo mytopo
+sudo mn --custom test1.py --topo mytopo --link=tc
