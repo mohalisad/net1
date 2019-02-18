@@ -35,4 +35,4 @@ class MyTopo( Topo ):
         self.addLink( h4, s2,delay='1s' )
 
 
-topos = { 'mytopo': ( lambda: MyTopo)}
+topos = { 'mytopo': ( lambda: MyTopo())}
