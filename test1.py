@@ -28,11 +28,11 @@ class MyTopo( Topo ):
         s2 = self.addSwitch( 's2' )
 
         # Add links
-        self.addLink( h1, s1,delay='20ms' )
-        self.addLink( h2, s1,delay='20ms' )
-        self.addLink( s1, s2,delay='50ms' )
-        self.addLink( h3, s2,delay='15ms' )
-        self.addLink( h4, s2,delay='1s' )
+        self.addLink( h1, s1, delay='20ms' )
+        self.addLink( h2, s1, delay='20ms' )
+        self.addLink( s1, s2, delay='50ms' )
+        self.addLink( h3, s2, delay='15ms' )
+        self.addLink( h4, s2, delay='1ms' )
 
 
 topos = { 'mytopo': ( lambda: MyTopo())}
