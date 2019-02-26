@@ -5,7 +5,7 @@ class MyTopo( Topo ):
     delay      = '90ms'
     bandwidth  = 15
     switch_que = 15
-    count      = 1
+    count      = 2
     def __init__( self ):
         switches = []
         # Initialize topology
@@ -19,8 +19,8 @@ class MyTopo( Topo ):
 
         # Add links
         #self.addLink(h1,switches[0],delay=self.delay,max_queue_size=self.switch_que,bw=self.bandwidth)
-        self.addLink(h1,switches[0],max_queue_size=self.switch_que)
-        self.addLink(h2,switches[-1],max_queue_size=self.switch_que)
+        self.addLink(h1,switches[0])
+        self.addLink(h2,switches[-1])
         for i in range(0,self.count-1):
-            self.addLink(switches[i],switches[i+1],max_queue_size=self.switch_que)
+            self.addLink(switches[i],switches[i+1])
 topos = { 'mytopo': ( lambda: MyTopo())}
