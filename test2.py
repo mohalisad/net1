@@ -2,7 +2,10 @@ from mininet.topo import Topo
 from mininet.link import TCLink
 
 class MyTopo( Topo ):
-    delay = '20ms'
+    delay      = '20ms'
+    bandwidth  = 1
+    switch_que = 1
+    count      = 2
     def __init__( self ):
         # Initialize topology
         Topo.__init__( self )
@@ -13,10 +16,7 @@ class MyTopo( Topo ):
         s1 = self.addSwitch( 's1' )
 
         # Add links
-        self.addLink( h1, s1, delay=self.delay,max_queue_size=1000)
-        self.addLink( h2, s1, delay=self.delay,max_queue_size=1000)
-        self.addLink( s1, s2, delay=self.delay,max_queue_size=1000)
-        self.addLink( h3, s2, delay=self.delay,max_queue_size=1000)
-        self.addLink( h4, s2, delay=self.delay,max_queue_size=1000)
+        self.addLink(h1,s1,delay=self.delay,max_queue_size=self.switch_que,bw=self.bandwidth)
+        self.addLink(h2,s1,delay=self.delay,max_queue_size=self.switch_que,bw=self.bandwidth)
 
 topos = { 'mytopo': ( lambda: MyTopo())}
