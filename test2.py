@@ -5,7 +5,7 @@ class MyTopo( Topo ):
     delay      = '90ms'
     bandwidth  = 15
     switch_que = 15
-    count      = 2
+    count      = 7
     def __init__( self ):
         switches = []
         # Initialize topology
