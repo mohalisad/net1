@@ -3,7 +3,7 @@ from mininet.link import TCLink
 
 class MyTopo( Topo ):
     delay      = '90ms'
-    bandwidth  = 1
+    bandwidth  = 15
     switch_que = 1
     count      = 1
     def __init__( self ):
