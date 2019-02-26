@@ -4,7 +4,7 @@ from mininet.link import TCLink
 class MyTopo( Topo ):
     delay      = '90ms'
     bandwidth  = 1
-    switch_que = 2
+    switch_que = 1
     count      = 1
     def __init__( self ):
         switches = []
@@ -19,8 +19,8 @@ class MyTopo( Topo ):
 
         # Add links
         #self.addLink(h1,switches[0],delay=self.delay,max_queue_size=self.switch_que,bw=self.bandwidth)
-        self.addLink(h1,switches[0],delay=self.delay)
-        self.addLink(h2,switches[-1],delay=self.delay)
+        self.addLink(h1,switches[0],bw=self.bandwidth)
+        self.addLink(h2,switches[-1],bw=self.bandwidth)
         for i in range(0,self.count-1):
-            self.addLink(switches[i],switches[i+1],delay=self.delay)
+            self.addLink(switches[i],switches[i+1],bw=self.bandwidth)
 topos = { 'mytopo': ( lambda: MyTopo())}
