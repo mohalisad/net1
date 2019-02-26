@@ -1,12 +1,3 @@
-
-"""
-	A pure python ping implementation using raw sockets.
-
-	Note that ICMP messages can only be send from processes running as root
-
-"""
-
-
 import os
 import select
 import signal
@@ -15,16 +6,9 @@ import sys
 import time
 import socket,sys
 from impacket import ImpactPacket
-#import ifaddr
+import ifaddr
 
-
-
-if sys.platform.startswith("win32"):
-	# On Windows, the best timer is time.clock()
-	default_timer = time.clock
-else:
-	# On most other platforms the best timer is time.time()
-	default_timer = time.time
+default_timer = time.time
 
 
 # ICMP parameters
