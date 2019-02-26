@@ -1,12 +1,3 @@
-
-"""
-	A pure python ping implementation using raw sockets.
-
-	Note that ICMP messages can only be send from processes running as root
-
-"""
-
-
 import os
 import select
 import signal
@@ -17,14 +8,7 @@ import socket,sys
 from impacket import ImpactPacket
 import ifaddr
 
-
-
-if sys.platform.startswith("win32"):
-	# On Windows, the best timer is time.clock()
-	default_timer = time.clock
-else:
-	# On most other platforms the best timer is time.time()
-	default_timer = time.time
+default_timer = time.time
 
 
 # ICMP parameters
@@ -124,7 +108,7 @@ class Ping(object):
 		else:
 			print(msg)
 
-		raise Exception
+		raise Exception, "unknown_host"
 		#sys.exit(-1)
 
 	def print_success(self, delay, ip, packet_size, ip_header, icmp_header, header=False):
@@ -133,7 +117,7 @@ class Ping(object):
 		else:
 			from_info = "%s (%s)" % (self.destination, ip)
 
-		msg = "%d bytes from %s: icmp_seq=%d ttl=%d time=%.1f ms" % (packet_size, from_info, icmp_header["seq_number"], ip_header["ttl"], delay)
+	   	msg = "%d bytes from %s: icmp_seq=%d ttl=%d time=%.1f ms" % (packet_size, from_info, icmp_header["seq_number"], ip_header["ttl"], delay)
 
 		if self.quiet_output:
 			self.response.output.append(msg)
@@ -385,5 +369,5 @@ def ping(source, hostname, timeout=1000, count=3, packet_size=55, *args, **kwarg
 	p = Ping(source, hostname, timeout, packet_size, *args, **kwargs)
 	return p.run(count)
 
-ping("192.168.43.227", "192.168.43.1")    #put your IP and destination IP address as the ping function argument and run the code. you can ping
+ping(Your IP Address, Destination IP Address)    #put your IP and destination IP address as the ping function argument and run the code. you can ping
 												 #the destination with your own code!!!
