@@ -19,7 +19,7 @@ class MyTopo( Topo ):
 
         # Add links
         self.addLink(h1,switches[0],delay=self.delay,max_queue_size=self.switch_que,bw=self.bandwidth)
-        self.addLink(h2,switches[-1]=self.delay,max_queue_size=self.switch_que,bw=self.bandwidth)
+        self.addLink(h2,switches[-1],delay=self.delay,max_queue_size=self.switch_que,bw=self.bandwidth)
         for i in range(1,count-1):
             self.addLink(switches[i],switches[i+1],delay=self.delay,max_queue_size=self.switch_que,bw=self.bandwidth)
 topos = { 'mytopo': ( lambda: MyTopo())}
