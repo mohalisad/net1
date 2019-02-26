@@ -242,61 +242,9 @@ class Ping(object):
 
 	#--------------------------------------------------------------------------
 
-	def run(self, count=None, deadline=None):
-		"""
-		send and receive pings in a loop. Stop if count or until deadline.
-		"""
-		if not self.quiet_output:
-			self.setup_signal_handler()
-
-		while True:
-			delay = self.do()
-
-			self.seq_number += 1
-			if count and self.seq_number >= count:
-				break
-			if deadline and self.total_time >= deadline:
-				break
-
-			if delay == None:
-				delay = 0
-
-			# Pause for the remainder of the MAX_SLEEP period (if applicable)
-			if (MAX_SLEEP > delay):
-				time.sleep((MAX_SLEEP - delay) / 1000.0)
-
-		self.print_exit()
-		if self.quiet_output:
-			return self.response
-
-	def do(self):
-
-		# Send one ICMP ECHO_REQUEST and receive the response until self.timeout
-
-		send_time = self.send_one_ping(current_socket)
-		if send_time == None:
-			return
-		self.send_count += 1
-
-		receive_time, packet_size, ip, ip_header, icmp_header = self.receive_one_ping(current_socket)
-		current_socket.close()
-		if receive_time:
-			self.receive_count += 1
-			delay = (receive_time - send_time) * 1000.0
-			self.total_time += delay
-			if self.min_time > delay:
-				self.min_time = delay
-			if self.max_time < delay:
-				self.max_time = delay
-
-			self.print_success(delay, ip, packet_size, ip_header, icmp_header)
-			return delay
-		else:
-			self.print_failed()
-
 
 	# send an ICMP ECHO_REQUEST packet
-	def send_one_ping(self, current_socket):
+	def send_one_ping(self):
 
 		#Create a new IP packet and set its source and destination IP addresses
 		src = self.source
@@ -326,10 +274,9 @@ class Ping(object):
 
 		# send the provided ICMP packet over a 3rd socket
 		try:
-			current_socket.sendto(ip.get_packet(), (dst, 1)) # Port number is irrelevant for ICMP
+			self.current_socket.sendto(ip.get_packet(), (dst, 1)) # Port number is irrelevant for ICMP
 		except socket.error as e:
-			self.response.output.append("General failure (%s)" % (e.args[1]))
-			current_socket.close()
+			self.response.output.append("General failure (%s)" % (e.args[1])))
 			return
 
 		return send_time
@@ -337,7 +284,7 @@ class Ping(object):
 	# Receive the ping from the socket.
 	#timeout = in ms
 
-	def receive_one_ping(self, current_socket):
+	def receive_one_ping(self):
 
 		timeout = self.timeout / 1000.0
 
@@ -351,6 +298,9 @@ class Ping(object):
 
 			packet_data, address = current_socket.recvfrom(ICMP_MAX_RECV)
 
+			if timeout - select_duration <= 0:
+				return None, 0, 0, 0, 0
+
 			icmp_header = self.header2dict(
 				names=[
 					"type", "code", "checksum",
@@ -360,35 +310,21 @@ class Ping(object):
 				data=packet_data[20:28]
 			)
 
-			# if icmp_header["packet_id"] == self.own_id: # Our packet!!!
-			# it should not be our packet!!!Why?
-			if True:
-				ip_header = self.header2dict(
-					names=[
-						"version", "type", "length",
-						"id", "flags", "ttl", "protocol",
-						"checksum", "src_ip", "dest_ip"
-					],
-					struct_format="!BBHHHBBHII",
-					data=packet_data[:20]
-				)
+			ip_header = self.header2dict(
+				names=[
+					"version", "type", "length",
+					"id", "flags", "ttl", "protocol",
+					"checksum", "src_ip", "dest_ip"
+				],
+				struct_format="!BBHHHBBHII",
+				data=packet_data[:20]
+			)
 
-				src_ip = socket.inet_ntoa(struct.pack("!I", ip_header["src_ip"]))
-                dest_ip = socket.inet_ntoa(struct.pack("!I", ip_header["dest_ip"]))
-                id = ip_header["id"]
-				return packet_data[28:] packet_id, src_ip, dest_ip
-
-			timeout = timeout - select_duration
-			if timeout <= 0:
-				return None, 0, 0, 0, 0
+			src_ip = socket.inet_ntoa(struct.pack("!I", ip_header["src_ip"]))
+			dest_ip = socket.inet_ntoa(struct.pack("!I", ip_header["dest_ip"]))
+			id = struct.pack("h", ip_header["id"])
+			return packet_data[28:] packet_id, src_ip, dest_ip
 
     def update_data(self, data, id):
         self.data = data
         self.id = id
-
-def ping(source, hostname, timeout=1000, count=3, packet_size=55, *args, **kwargs):
-	p = Ping(source, hostname, timeout, packet_size, *args, **kwargs)
-	return p.run(count)
-
-ping(Your IP Address, Destination IP Address)    #put your IP and destination IP address as the ping function argument and run the code. you can ping
-												 #the destination with your own code!!!
