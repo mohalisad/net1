@@ -14,12 +14,12 @@ class MyTopo( Topo ):
         # Add hosts and switches
         h1 = self.addHost( 'h1' )
         h2 = self.addHost( 'h2' )
-        for i in range(count):
+        for i in range(self.count):
             switches.append(self.addSwitch( 's' + str(i) ))
 
         # Add links
         self.addLink(h1,switches[0],delay=self.delay,max_queue_size=self.switch_que,bw=self.bandwidth)
         self.addLink(h2,switches[-1],delay=self.delay,max_queue_size=self.switch_que,bw=self.bandwidth)
-        for i in range(1,count-1):
+        for i in range(1,self.count-1):
             self.addLink(switches[i],switches[i+1],delay=self.delay,max_queue_size=self.switch_que,bw=self.bandwidth)
 topos = { 'mytopo': ( lambda: MyTopo())}
