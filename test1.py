@@ -2,11 +2,7 @@ from mininet.topo import Topo
 from mininet.link import TCLink
 
 class MyTopo( Topo ):
-    "Simple topology example."
-
     def __init__( self ):
-        "Create custom topo."
-
         # Initialize topology
         Topo.__init__( self )
 
