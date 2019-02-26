@@ -4,8 +4,8 @@ from mininet.link import TCLink
 class MyTopo( Topo ):
     delay      = '20ms'
     bandwidth  = 1
-    switch_que = 1
-    count      = 2
+    switch_que = 2
+    count      = 9
     def __init__( self ):
         switches = []
         # Initialize topology
