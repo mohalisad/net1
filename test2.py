@@ -2,7 +2,7 @@ from mininet.topo import Topo
 from mininet.link import TCLink
 
 class MyTopo( Topo ):
-    delay      = '20ms'
+    delay      = '90ms'
     bandwidth  = 1
     switch_que = 2
     count      = 1
