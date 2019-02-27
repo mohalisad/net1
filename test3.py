@@ -3,8 +3,8 @@ from mininet.net import Mininet
 from mininet.node import CPULimitedHost
 from mininet.link import TCLink
 from mininet.cli import CLI
+from myping import HOST_COUNT
 
-HOST_COUNT = 4
 
 class MyTopo( Topo ):
     def __init__( self ):
@@ -18,5 +18,5 @@ class MyTopo( Topo ):
 net = Mininet(MyTopo(),link=TCLink)
 net.start()
 for host in net.hosts:
-    host.cmd( 'python /home/mininet/develoer/net1/servant.py')
+    host.cmd( 'python /home/mininet/develoer/net1/servant.py &')
 CLI(net)
