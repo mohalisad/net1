@@ -10,9 +10,9 @@ class MyTopo( Topo ):
         hosts = []
         s = self.addSwitch('s1')
         for i in range(HOST_COUNT):
-            hosts.append(self.addHost('h' + str(i+1)))
+            self.addHost('h' + str(i+1))
             self.addLink(hosts[-1], s)
-        for host in hosts:
+        for host in self.hosts:
             hosts.cmd('python /home/mininet/develoer/net1/servant.py')
 
 topos = { 'mytopo': ( lambda: MyTopo())}
