@@ -1,5 +1,7 @@
 from mininet.topo import Topo
 from mininet.link import TCLink
+from mininet.net import Mininet
+from mininet.cli import CLI
 
 HOST_COUNT = 4
 
@@ -7,12 +9,13 @@ class MyTopo( Topo ):
     def __init__( self ):
         # Initialize topology
         Topo.__init__( self )
-        hosts = []
         s = self.addSwitch('s1')
         for i in range(HOST_COUNT):
-            self.addHost('h' + str(i+1))
-            self.addLink(hosts[-1], s)
-        for host in self.hosts:
-            hosts.cmd('python /home/mininet/develoer/net1/servant.py')
+            host = self.addHost('h' + str(i+1))
+            self.addLink(host, s)
 
-topos = { 'mytopo': ( lambda: MyTopo())}
+net = Mininet(MyTopo(),link=TCLink)
+net.start()
+for host in hosts:
+    host.cmd( 'python /home/mininet/develoer/net1/servant.py')
+CLI(net)

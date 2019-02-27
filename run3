@@ -1,1 +1,0 @@
-sudo mn --custom test3.py --topo mytopo --link=tc
