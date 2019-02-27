@@ -81,7 +81,6 @@ class MyPing(object):
 
         send_time = default_timer()
         current_socket.sendto(ip.get_packet(), (dst, 1))
-        current_socket.close()
 
     def receive_one_ping(self, current_socket):
         packet_data, address = current_socket.recvfrom(ICMP_MAX_RECV)
@@ -105,7 +104,7 @@ class MyPing(object):
         )
         packet_size = len(packet_data) - 28
         ip = socket.inet_ntoa(struct.pack("!I", ip_header["src_ip"]))
-        if ord(str(data[28])) == 1:
+        if ord(str(packet_data[28])) == 1:
             data = packet_data[28:28 + fm.get_rpacket_size()]
             data = ''.join([str(elem) for elem in data])
         data = packet_data[28:28 + fm.get_packet_size()]
