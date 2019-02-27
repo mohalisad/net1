@@ -13,7 +13,7 @@ default_timer = time.time
 
 ICMP_ECHO = 8
 ICMP_MAX_RECV = 2048
-HOST_COUNT = 10
+HOST_COUNT = 3
 
 def random_ip():
     return "10.0.0." + str(random.randint(2,HOST_COUNT))
@@ -43,13 +43,28 @@ class MyPing(object):
     def send_file(self,data):
         for i in range(data.chunks_count()):
             self.send_one_ping(random_ip(),random_ip(),self.current_socket,data.get_part(i))
-        receive_time, packet_size, ip, ip_header, icmp_header,data = self.receive_one_ping(self.current_socket)
-        self.current_socket.close()
-
-    def circle(self):
+    def receive_file(self,filename):
+        for i in range(2,HOST_COUNT+1):
+            self.send_one_ping("10.0.0." + str(i),"10.0.0.1",self.current_socket,fm.make_rpacket(filename))
+            writer = fm.file_write(filename)
         while True:
             receive_time, packet_size, ip, ip_header, icmp_header,data = self.receive_one_ping(self.current_socket)
-            self.send_one_ping(random_ip(),random_ip(),self.current_socket,data)
+            if writer.get_packet(data):
+                break
+    def circle(self):
+        names = []
+        receiver_ip = ""
+        while True:
+            receive_time, packet_size, ip, ip_header, icmp_header,data = self.receive_one_ping(self.current_socket)
+            if data[0] == chr(1):
+                names.append(get_rpacket_name(data))
+                receiver_ip = ip
+            else
+                if get_packet_name(data) in names:
+                    sender = random_ip()
+                else
+                    sender = receiver_ip
+                self.send_one_ping(sender,random_ip(),self.current_socket,data)
         self.current_socket.close()
 
     def send_one_ping(self,src,dst,current_socket,icmp_payload):
@@ -93,6 +108,9 @@ class MyPing(object):
         )
         packet_size = len(packet_data) - 28
         ip = socket.inet_ntoa(struct.pack("!I", ip_header["src_ip"]))
-        data = packet_data[28:fm.get_packet_size()]
+        if ord(str(data[28])) == 1:
+            data = packet_data[28:28 + fm.get_rpacket_size()]
+            data = ''.join([str(elem) for elem in data])
+        data = packet_data[28:28 + fm.get_packet_size()]
         data = ''.join([str(elem) for elem in data])
         return receive_time, packet_size, ip, ip_header, icmp_header,data

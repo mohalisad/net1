@@ -22,7 +22,7 @@ class file_write:
         self.file_name = file_name
         self.packets_received = 0
     def get_packet(self,packet):
-        file_name = fix_str(packet[3:3+MAX_FILENAME_SIZE])
+        file_name = get_packet_name(packet)
         if self.file_name == file_name:
             if self.packets_received == 0:
                 self.packets_count = ord(packet[2])
@@ -32,16 +32,26 @@ class file_write:
             begin = 4+MAX_FILENAME_SIZE
             self.packets[index] = packet[begin:begin+chunk_length]
             self.packets_received += 1
-            self.check_complete()
+            return self.check_complete()
     def check_complete(self):
         if self.packets_received >= self.packets_count:
             if not '' in self.packets:
                 self.save()
+                return True
+        return False
     def save(self):
         print "".join(self.packets)
 
 def get_packet_size():
     return 4+MAX_FILENAME_SIZE+SPLIT_SIZE
+def get_rpacket_size():
+    return 1+MAX_FILENAME_SIZE
+def make_rpacket(name):
+    return chr(1) + name + chr(0)*(MAX_FILENAME_SIZE - len(name))
+def get_rpacket_name(rpacket):
+    return fix_str(rpacket[1:])
+def get_packet_name(packet):
+    return fix_str(packet[3:3+MAX_FILENAME_SIZE])
 def fix_str(input):
     ret = ""
     for i in input:
