@@ -40,7 +40,7 @@ class MyPing(object):
         return dict(zip(names, unpacked_data))
 
     def send_file(self,data):
-        for i in range(data.chunks_count):
+        for i in range(data.chunks_count()):
             self.send_one_ping(random_ip(),random_ip(),self.current_socket,data.get_part(i))
         receive_time, packet_size, ip, ip_header, icmp_header = self.receive_one_ping(self.current_socket)
         self.current_socket.close()
