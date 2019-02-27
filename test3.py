@@ -11,7 +11,7 @@ class MyTopo( Topo ):
         hosts = []
         s = self.addSwitch('s1')
         for i in range(HOST_COUNT):
-            hosts.append(self.addHost('h' + str(i)))
+            hosts.append(self.addHost('h' + str(i+1)))
             self.addLink(hosts[-1], s)
 
 
