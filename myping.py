@@ -48,9 +48,7 @@ class MyPing(object):
             self.send_one_ping("10.0.0." + str(i),"10.0.0.1",self.current_socket,fm.make_rpacket(filename))
             writer = fm.file_write(filename)
         while True:
-            print "begin"
             receive_time, packet_size, ip, ip_header, icmp_header,data = self.receive_one_ping(self.current_socket)
-            print "end"
             if writer.get_packet(data):
                 break
     def circle(self):
@@ -61,8 +59,6 @@ class MyPing(object):
             if data[0] == chr(1):
                 names.append(fm.get_rpacket_name(data))
                 receiver_ip = ip
-                print(names)
-                print(receiver_ip)
             else:
                 if fm.get_packet_name(data) in names:
                     sender = receiver_ip

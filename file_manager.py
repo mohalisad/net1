@@ -34,6 +34,7 @@ class file_write:
             self.packets_received += 1
             return self.check_complete()
     def check_complete(self):
+        print(self.packets)
         if self.packets_received >= self.packets_count:
             if not '' in self.packets:
                 self.save()
