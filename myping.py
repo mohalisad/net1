@@ -59,7 +59,8 @@ class MyPing(object):
             if data[0] == chr(1):
                 names.append(fm.get_rpacket_name(data))
                 receiver_ip = ip
-                print("n:"+names)
+                print "here2"
+                print(names)
                 print(receiver_ip)
             else:
                 if fm.get_packet_name(data) in names:
