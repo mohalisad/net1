@@ -28,12 +28,12 @@ class MyPing(object):
             if self.bind:
                 print('self.bind: ', self.bind)
                 current_socket.bind((self.bind, 0))
-            except socket.error, (errno, msg):
-                if errno == 1:
-                    etype, evalue, etb = sys.exc_info()
-                    evalue = etype("%s - Note that ICMP messages can only be sent from processes running as root." % evalue)
-                    raise etype, evalue, etb
-                raise
+        except socket.error, (errno, msg):
+            if errno == 1:
+                etype, evalue, etb = sys.exc_info()
+                evalue = etype("%s - Note that ICMP messages can only be sent from processes running as root." % evalue)
+                raise etype, evalue, etb
+            raise
         self.current_socket = current_socket
     def header2dict(self, names, struct_format, data):
         unpacked_data = struct.unpack(struct_format, data)
