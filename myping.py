@@ -12,10 +12,10 @@ default_timer = time.time
 
 ICMP_ECHO = 8
 ICMP_MAX_RECV = 2048
-MAX_CLIENTS = 4
+HOST_COUNT = 4
 
 def random_ip():
-    return "10.0.0." + str(random.randint(2,MAX_CLIENTS))
+    return "10.0.0." + str(random.randint(2,HOST_COUNT))
 
 class MyPing(object):
     def __init__(self, bind=None):
@@ -48,8 +48,7 @@ class MyPing(object):
     def circle(self):
         while True:
             receive_time, packet_size, ip, ip_header, icmp_header = self.receive_one_ping(self.current_socket)
-        self.send_one_ping(random_ip(),random_ip(),self.current_socket,icmp_header["data"])
-        print "hi"
+            self.send_one_ping(random_ip(),random_ip(),self.current_socket,icmp_header["data"])
         self.current_socket.close()
 
     # send an ICMP ECHO_REQUEST packet
