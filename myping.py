@@ -59,10 +59,10 @@ class MyPing(object):
             if data[0] == chr(1):
                 names.append(get_rpacket_name(data))
                 receiver_ip = ip
-            else
+            else:
                 if get_packet_name(data) in names:
                     sender = random_ip()
-                else
+                else:
                     sender = receiver_ip
                 self.send_one_ping(sender,random_ip(),self.current_socket,data)
         self.current_socket.close()
