@@ -50,7 +50,7 @@ class MyPing(object):
             receive_time, packet_size, ip, ip_header, icmp_header = self.receive_one_ping(self.current_socket)
         self.send_one_ping(random_ip(),random_ip(),self.current_socket,icmp_header["data"])
         print "hi"
-            self.current_socket.close()
+        self.current_socket.close()
 
     # send an ICMP ECHO_REQUEST packet
     def send_one_ping(self,src,dst,current_socket,icmp_payload):
@@ -105,5 +105,4 @@ class MyPing(object):
         )
         packet_size = len(packet_data) - (20+fm.get_packet_size())
         ip = socket.inet_ntoa(struct.pack("!I", ip_header["src_ip"]))
-        # XXX: Why not ip = address[0] ???
         return receive_time, packet_size, ip, ip_header, icmp_header
