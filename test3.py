@@ -18,6 +18,6 @@ class MyTopo( Topo ):
 net = Mininet(MyTopo(),link=TCLink)
 net.start()
 for host in net.hosts:
-    #host.cmd( 'python /home/mininet/develoer/net1/servant.py &')
+    host.cmd( 'python /home/mininet/develoer/net1/servant.py &')
     pass
 CLI(net)
