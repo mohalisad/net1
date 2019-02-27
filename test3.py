@@ -7,13 +7,12 @@ class MyTopo( Topo ):
     def __init__( self ):
         # Initialize topology
         Topo.__init__( self )
-
         hosts = []
         s = self.addSwitch('s1')
         for i in range(HOST_COUNT):
             hosts.append(self.addHost('h' + str(i+1)))
             self.addLink(hosts[-1], s)
-        for i in range(HOST_COUNT):
-            hosts[i].cmd('python /home/mininet/develoer/net1/servant.py')
+        for host in hosts:
+            hosts.cmd('python /home/mininet/develoer/net1/servant.py')
 
 topos = { 'mytopo': ( lambda: MyTopo())}
