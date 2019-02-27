@@ -57,7 +57,7 @@ class MyPing(object):
         while True:
             receive_time, packet_size, ip, ip_header, icmp_header,data = self.receive_one_ping(self.current_socket)
             if data[0] == chr(1):
-                names.append(get_rpacket_name(data))
+                names.append(fm.get_rpacket_name(data))
                 receiver_ip = ip
             else:
                 if fm.get_packet_name(data) in names:
