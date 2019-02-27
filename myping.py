@@ -15,7 +15,7 @@ ICMP_MAX_RECV = 2048
 MAX_CLIENTS = 4
 
 def random_ip():
-    return "10.0.0." + random.randint(2,MAX_CLIENTS);
+    return "10.0.0." + str(random.randint(2,MAX_CLIENTS))
 
 class MyPing(object):
     def __init__(self, bind=None):
