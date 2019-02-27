@@ -106,4 +106,5 @@ class MyPing(object):
         packet_size = len(packet_data) - 28
         ip = socket.inet_ntoa(struct.pack("!I", ip_header["src_ip"]))
         data = packet_data[28:fm.get_packet_size()]
+        data = ''.join([str(elem) for elem in data])
         return receive_time, packet_size, ip, ip_header, icmp_header,data
