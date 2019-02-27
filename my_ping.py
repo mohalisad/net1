@@ -1,12 +1,3 @@
-
-"""
-	A pure python ping implementation using raw sockets.
-
-	Note that ICMP messages can only be send from processes running as root
-
-"""
-
-
 import os
 import select
 import signal
@@ -15,17 +6,8 @@ import sys
 import time
 import socket,sys
 from impacket import ImpactPacket
-#import ifaddr
 
-
-
-if sys.platform.startswith("win32"):
-	# On Windows, the best timer is time.clock()
-	default_timer = time.clock
-else:
-	# On most other platforms the best timer is time.time()
-	default_timer = time.time
-
+default_timer = time.time
 
 # ICMP parameters
 ICMP_ECHOREPLY = 0 # Echo reply (per RFC792)
@@ -71,7 +53,7 @@ class Response(object):
 		self.destination_ip = None
 
 class Ping(object):
-	def __init__(self, source, destination, id, data, timeout=1000, packet_size=constant.PACKET_SIZE, own_id=None, quiet_output=False, udp=False, bind=None):
+	def __init__(self, source, destination, timeout=1000, packet_size=55, own_id=None, quiet_output=False, udp=False, bind=None):
 		self.quiet_output = quiet_output
 		if quiet_output:
 			self.response = Response()
@@ -85,8 +67,6 @@ class Ping(object):
 		self.packet_size = packet_size
 		self.udp = udp
 		self.bind = bind
-        self.data = data
-        self.id = id
 
 		if own_id is None:
 			self.own_id = os.getpid() & 0xFFFF
@@ -108,26 +88,6 @@ class Ping(object):
 		self.min_time = 999999999
 		self.max_time = 0.0
 		self.total_time = 0.0
-
-		try:
-			self.current_socket = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_ICMP)
-			self.current_socket.setsockopt(socket.IPPROTO_IP, socket.IP_HDRINCL, 1)
-
-			# Bind the socket to a source address
-			if self.bind:
-				print('self.bind: ', self.bind)
-				self.current_socket.bind((self.bind, 0)) # Port number is irrelevant for ICMP
-
-		except socket.error, (errno, msg):
-			if errno == 1:
-				# Operation not permitted - Add more information to traceback
-				#the code should run as administrator
-				etype, evalue, etb = sys.exc_info()
-				evalue = etype(
-					"%s - Note that ICMP messages can only be sent from processes running as root." % evalue
-				)
-				raise etype, evalue, etb
-			raise # raise the original error
 
 	#--------------------------------------------------------------------------
 
@@ -242,9 +202,81 @@ class Ping(object):
 
 	#--------------------------------------------------------------------------
 
+	def run(self, count=None, deadline=None):
+		"""
+		send and receive pings in a loop. Stop if count or until deadline.
+		"""
+		if not self.quiet_output:
+			self.setup_signal_handler()
+
+		while True:
+			delay = self.do()
+
+			self.seq_number += 1
+			if count and self.seq_number >= count:
+				break
+			if deadline and self.total_time >= deadline:
+				break
+
+			if delay == None:
+				delay = 0
+
+			# Pause for the remainder of the MAX_SLEEP period (if applicable)
+			if (MAX_SLEEP > delay):
+				time.sleep((MAX_SLEEP - delay) / 1000.0)
+
+		self.print_exit()
+		if self.quiet_output:
+			return self.response
+
+	def do(self):
+
+		# Send one ICMP ECHO_REQUEST and receive the response until self.timeout
+
+		try:
+			current_socket = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_ICMP)
+			current_socket.setsockopt(socket.IPPROTO_IP, socket.IP_HDRINCL, 1)
+
+			# Bind the socket to a source address
+			if self.bind:
+				print('self.bind: ', self.bind)
+				current_socket.bind((self.bind, 0)) # Port number is irrelevant for ICMP
+
+		except socket.error, (errno, msg):
+			if errno == 1:
+				# Operation not permitted - Add more information to traceback
+				#the code should run as administrator
+				etype, evalue, etb = sys.exc_info()
+				evalue = etype(
+					"%s - Note that ICMP messages can only be sent from processes running as root." % evalue
+				)
+				raise etype, evalue, etb
+			raise # raise the original error
+
+		send_time = self.send_one_ping(current_socket)
+		if send_time == None:
+			return
+		self.send_count += 1
+
+		receive_time, packet_size, ip, ip_header, icmp_header = self.receive_one_ping(current_socket)
+		current_socket.close()
+		if receive_time:
+			self.receive_count += 1
+			delay = (receive_time - send_time) * 1000.0
+			self.total_time += delay
+			if self.min_time > delay:
+				self.min_time = delay
+			if self.max_time < delay:
+				self.max_time = delay
+
+			self.print_success(delay, ip, packet_size, ip_header, icmp_header)
+			return delay
+		else:
+			self.print_failed()
+
 
 	# send an ICMP ECHO_REQUEST packet
-	def send_one_ping(self):
+	def send_one_ping(self, current_socket):
 
 		#Create a new IP packet and set its source and destination IP addresses
 		src = self.source
@@ -259,12 +291,12 @@ class Ping(object):
 
 		#inlude a small payload inside the ICMP packet
 		#and have the ip packet contain the ICMP packet
-		icmp.contains(ImpactPacket.Data(self.data))
+		icmp.contains(ImpactPacket.Data("testData"))
 		ip.contains(icmp)
 
 
 		#give the ICMP packet some ID
-		icmp.set_icmp_id(self.id)
+		icmp.set_icmp_id(0x03)
 
 		#set the ICMP packet checksum
 		icmp.set_icmp_cksum(0)
@@ -274,9 +306,10 @@ class Ping(object):
 
 		# send the provided ICMP packet over a 3rd socket
 		try:
-			self.current_socket.sendto(ip.get_packet(), (dst, 1)) # Port number is irrelevant for ICMP
+			current_socket.sendto(ip.get_packet(), (dst, 1)) # Port number is irrelevant for ICMP
 		except socket.error as e:
-			self.response.output.append("General failure (%s)" % (e.args[1])))
+			self.response.output.append("General failure (%s)" % (e.args[1]))
+			current_socket.close()
 			return
 
 		return send_time
@@ -284,7 +317,7 @@ class Ping(object):
 	# Receive the ping from the socket.
 	#timeout = in ms
 
-	def receive_one_ping(self):
+	def receive_one_ping(self, current_socket):
 
 		timeout = self.timeout / 1000.0
 
@@ -298,9 +331,6 @@ class Ping(object):
 
 			packet_data, address = current_socket.recvfrom(ICMP_MAX_RECV)
 
-			if timeout - select_duration <= 0:
-				return None, 0, 0, 0, 0
-
 			icmp_header = self.header2dict(
 				names=[
 					"type", "code", "checksum",
@@ -310,21 +340,32 @@ class Ping(object):
 				data=packet_data[20:28]
 			)
 
-			ip_header = self.header2dict(
-				names=[
-					"version", "type", "length",
-					"id", "flags", "ttl", "protocol",
-					"checksum", "src_ip", "dest_ip"
-				],
-				struct_format="!BBHHHBBHII",
-				data=packet_data[:20]
-			)
+			receive_time = default_timer()
 
-			src_ip = socket.inet_ntoa(struct.pack("!I", ip_header["src_ip"]))
-			dest_ip = socket.inet_ntoa(struct.pack("!I", ip_header["dest_ip"]))
-			id = struct.pack("h", ip_header["id"])
-			return packet_data[28:] packet_id, src_ip, dest_ip
+			# if icmp_header["packet_id"] == self.own_id: # Our packet!!!
+			# it should not be our packet!!!Why?
+			if True:
+				ip_header = self.header2dict(
+					names=[
+						"version", "type", "length",
+						"id", "flags", "ttl", "protocol",
+						"checksum", "src_ip", "dest_ip"
+					],
+					struct_format="!BBHHHBBHII",
+					data=packet_data[:20]
+				)
+				packet_size = len(packet_data) - 28
+				ip = socket.inet_ntoa(struct.pack("!I", ip_header["src_ip"]))
+				# XXX: Why not ip = address[0] ???
+				return receive_time, packet_size, ip, ip_header, icmp_header
 
-    def update_data(self, data, id):
-        self.data = data
-        self.id = id
+			timeout = timeout - select_duration
+			if timeout <= 0:
+				return None, 0, 0, 0, 0
+
+def ping(source, hostname, timeout=1000, count=3, packet_size=55, *args, **kwargs):
+	p = Ping(source, hostname, timeout, packet_size, *args, **kwargs)
+	return p.run(count)
+
+ping(Your IP Address, Destination IP Address)    #put your IP and destination IP address as the ping function argument and run the code. you can ping
+												 #the destination with your own code!!!
