@@ -10,7 +10,7 @@ class MyTopo( Topo ):
 
         hosts = []
         s = self.addSwitch('s')
-        for i in range(constant.HOST_COUNT):
+        for i in range(HOST_COUNT):
             hosts.append(elf.addHost('h' + str(i)))
             self.addLink(hosts[-1], s)
 
