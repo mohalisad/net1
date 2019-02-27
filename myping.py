@@ -52,34 +52,22 @@ class MyPing(object):
             self.send_one_ping(random_ip(),random_ip(),self.current_socket,data)
         self.current_socket.close()
 
-    # send an ICMP ECHO_REQUEST packet
     def send_one_ping(self,src,dst,current_socket,icmp_payload):
         ip = ImpactPacket.IP()
         ip.set_ip_src(src)
         ip.set_ip_dst(dst)
-
-        #Create a new ICMP ECHO_REQUEST packet
         icmp = ImpactPacket.ICMP()
         icmp.set_icmp_type(icmp.ICMP_ECHO)
-
-        #inlude a small payload inside the ICMP packet
-        #and have the ip packet contain the ICMP packet
         icmp.contains(ImpactPacket.Data(icmp_payload))
         ip.contains(icmp)
-
-
-        #give the ICMP packet some ID
         icmp.set_icmp_id(0x03)
-
-        #set the ICMP packet checksum
         icmp.set_icmp_cksum(0)
         icmp.auto_checksum = 1
 
         send_time = default_timer()
 
         try:
-            current_socket.sendto(ip.get_packet(), (dst, 1)) # Port number is irrelevant for ICMP
-        except socket.error as e:
+            current_socket.sendto(ip.get_packet(), (dst, 1))
             current_socket.close()
             return
 
