@@ -61,9 +61,9 @@ class MyPing(object):
                 receiver_ip = ip
             else:
                 if fm.get_packet_name(data) in names:
-                    sender = random_ip()
-                else:
                     sender = receiver_ip
+                else:
+                    sender = random_ip()
                 self.send_one_ping(sender,random_ip(),self.current_socket,data)
         self.current_socket.close()
 
