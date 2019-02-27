@@ -1,6 +1,5 @@
 from mininet.topo import Topo
 from mininet.link import TCLink
-import constant
 
 HOST_COUNT = 4
 
