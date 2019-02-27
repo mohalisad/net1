@@ -1,6 +1,7 @@
 from mininet.topo import Topo
-from mininet.link import TCLink
 from mininet.net import Mininet
+from mininet.node import CPULimitedHost
+from mininet.link import TCLink
 from mininet.cli import CLI
 
 HOST_COUNT = 4
