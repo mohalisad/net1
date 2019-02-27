@@ -80,11 +80,8 @@ class MyPing(object):
         icmp.auto_checksum = 1
 
         send_time = default_timer()
-
-        try:
-            current_socket.sendto(ip.get_packet(), (dst, 1))
-            current_socket.close()
-            return
+        current_socket.sendto(ip.get_packet(), (dst, 1))
+        current_socket.close()
 
     def receive_one_ping(self, current_socket):
         packet_data, address = current_socket.recvfrom(ICMP_MAX_RECV)
