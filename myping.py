@@ -60,7 +60,7 @@ class MyPing(object):
                 names.append(get_rpacket_name(data))
                 receiver_ip = ip
             else:
-                if get_packet_name(data) in names:
+                if fm.get_packet_name(data) in names:
                     sender = random_ip()
                 else:
                     sender = receiver_ip
