@@ -48,7 +48,3 @@ def fix_str(input):
         if i == chr(0):
             return ret
         ret += i
-b = file_read("a.mpd")
-f = file_write("a.mpd")
-for i in range(b.chunks_count()):
-    f.get_packet(b.get_part(i))
