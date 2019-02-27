@@ -60,11 +60,15 @@ class MyPing(object):
                 names.append(fm.get_rpacket_name(data))
                 receiver_ip = ip
             else:
+                receiver = random_ip()
                 if fm.get_packet_name(data) in names:
                     sender = receiver_ip
                 else:
-                    sender = random_ip()
-                self.send_one_ping(sender,random_ip(),self.current_socket,data)
+                    while True:
+                        sender = random_ip()
+                        if sender != receiver:
+                            break
+                self.send_one_ping(sender,receiver,self.current_socket,data)
         self.current_socket.close()
 
     def send_one_ping(self,src,dst,current_socket,icmp_payload):
