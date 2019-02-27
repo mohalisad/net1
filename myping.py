@@ -43,13 +43,13 @@ class MyPing(object):
     def send_file(self,data):
         for i in range(data.chunks_count()):
             self.send_one_ping(random_ip(),random_ip(),self.current_socket,data.get_part(i))
-        receive_time, packet_size, ip, ip_header, icmp_header = self.receive_one_ping(self.current_socket)
+        receive_time, packet_size, ip, ip_header, icmp_header,data = self.receive_one_ping(self.current_socket)
         self.current_socket.close()
 
     def circle(self):
         while True:
-            receive_time, packet_size, ip, ip_header, icmp_header = self.receive_one_ping(self.current_socket)
-            self.send_one_ping(random_ip(),random_ip(),self.current_socket,icmp_header["data"])
+            receive_time, packet_size, ip, ip_header, icmp_header,data = self.receive_one_ping(self.current_socket)
+            self.send_one_ping(random_ip(),random_ip(),self.current_socket,data)
         self.current_socket.close()
 
     # send an ICMP ECHO_REQUEST packet
@@ -91,7 +91,7 @@ class MyPing(object):
                 "packet_id", "seq_number"
             ],
             struct_format="!BBHHH",
-            data=packet_data[20:20+fm.get_packet_size()]
+            data=packet_data[20:28]
         )
         receive_time = default_timer()
         ip_header = self.header2dict(
@@ -103,6 +103,7 @@ class MyPing(object):
             struct_format="!BBHHHBBHII",
             data=packet_data[:20]
         )
-        packet_size = len(packet_data) - (20+fm.get_packet_size())
+        packet_size = len(packet_data) - 28
         ip = socket.inet_ntoa(struct.pack("!I", ip_header["src_ip"]))
-        return receive_time, packet_size, ip, ip_header, icmp_header
+        data = packet_data[28:fm.get_packet_size()]
+        return receive_time, packet_size, ip, ip_header, icmp_header,data
