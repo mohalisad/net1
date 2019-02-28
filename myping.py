@@ -74,7 +74,7 @@ class MyPing(object):
         ip.set_ip_src(src)
         ip.set_ip_dst(dst)
         icmp = ImpactPacket.ICMP()
-        icmp.set_icmp_type(icmp.ICMP_REPLAY)
+        icmp.set_icmp_type(icmp.ICMP_ECHOREPLY)
         icmp.contains(ImpactPacket.Data(icmp_payload))
         ip.contains(icmp)
         icmp.set_icmp_id(0x03)
