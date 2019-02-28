@@ -12,7 +12,7 @@ import file_manager as fm
 default_timer = time.time
 
 ICMP_MAX_RECV = 2048
-HOST_COUNT = 10
+HOST_COUNT = 3
 
 def random_ip():
     return "10.0.0." + str(random.randint(2,HOST_COUNT))
