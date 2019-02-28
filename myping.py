@@ -12,7 +12,7 @@ import file_manager as fm
 default_timer = time.time
 
 ICMP_MAX_RECV = 2048
-HOST_COUNT = 10
+HOST_COUNT = 3
 
 def random_ip():
     return "10.0.0." + str(random.randint(2,HOST_COUNT))
@@ -41,10 +41,10 @@ class MyPing(object):
 
     def send_file(self,data):
         for i in range(data.chunks_count()):
-            self.send_one_ping(random_ip(),random_ip(),self.current_socket,data.get_part(i))
+            self.send_one_ping("10.0.0.1",random_ip(),self.current_socket,data.get_part(i))
     def receive_file(self,filename):
         for i in range(2,HOST_COUNT+1):
-            self.send_one_ping("10.0.0." + str(i),"10.0.0.1",self.current_socket,fm.make_rpacket(filename))
+            self.send_one_ping("10.0.0.1","10.0.0." + str(i),self.current_socket,fm.make_rpacket(filename))
             writer = fm.file_write(filename)
         while True:
             receive_time, packet_size, ip, ip_header, icmp_header,data = self.receive_one_ping(self.current_socket)
@@ -66,7 +66,7 @@ class MyPing(object):
                 else:
                     sender = random_ip()
                 time.sleep(2)
-                self.send_one_ping(sender,receiver,self.current_socket,data)
+                self.send_one_ping(receiver,sender,self.current_socket,data)
         self.current_socket.close()
 
     def send_one_ping(self,src,dst,current_socket,icmp_payload):
