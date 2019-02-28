@@ -74,8 +74,8 @@ class MyPing(object):
 
     def send_one_ping(self,src,dst,current_socket,icmp_payload):
         ip = ImpactPacket.IP()
-        ip.set_ip_src(dst)
-        ip.set_ip_dst(src)
+        ip.set_ip_src(src)
+        ip.set_ip_dst(dst)
         icmp = ImpactPacket.ICMP()
         icmp.set_icmp_type(icmp.ICMP_ECHO)
         icmp.contains(ImpactPacket.Data(icmp_payload))
