@@ -41,10 +41,10 @@ class MyPing(object):
 
     def send_file(self,data):
         for i in range(data.chunks_count()):
-            self.send_one_ping("10.0.0.1",random_ip(),self.current_socket,data.get_part(i))
+            self.send_one_ping(random_ip(),"10.0.0.1",self.current_socket,data.get_part(i))
     def receive_file(self,filename):
         for i in range(2,HOST_COUNT+1):
-            self.send_one_ping("10.0.0.1","10.0.0." + str(i),self.current_socket,fm.make_rpacket(filename))
+            self.send_one_ping("10.0.0." + str(i),"10.0.0.1",self.current_socket,fm.make_rpacket(filename))
             writer = fm.file_write(filename)
         while True:
             receive_time, packet_size, ip, ip_header, icmp_header,data = self.receive_one_ping(self.current_socket)
@@ -64,9 +64,12 @@ class MyPing(object):
                     sender = receiver_ip
                     data = chr(2) + data[1:]
                 else:
-                    sender = random_ip()
-                #time.sleep(2)
-                self.send_one_ping(receiver,sender,self.current_socket,data)
+                    while True:
+                        sender = random_ip()
+                        if sender != receiver:
+                            break
+                #time.sleep(.2)
+                self.send_one_ping(sender,receiver,self.current_socket,data)
         self.current_socket.close()
 
     def send_one_ping(self,src,dst,current_socket,icmp_payload):
@@ -85,7 +88,10 @@ class MyPing(object):
         current_socket.sendto(ip.get_packet(), (dst, 1))
 
     def receive_one_ping(self, current_socket):
-        packet_data, address = current_socket.recvfrom(ICMP_MAX_RECV)
+        while True:
+            packet_data, address = current_socket.recvfrom(ICMP_MAX_RECV)
+            if ord(str(packet_data[20])) == 0:
+                break
         icmp_header = self.header2dict(
             names=[
                 "type", "code", "checksum",
