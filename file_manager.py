@@ -1,4 +1,4 @@
-SPLIT_SIZE = 100
+SPLIT_SIZE = 200
 MAX_FILENAME_SIZE = 16
 class file_read:
     def __init__(self,path):
