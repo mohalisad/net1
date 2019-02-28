@@ -66,6 +66,7 @@ class MyPing(object):
                     data = chr(2) + data[1:]
                 else:
                     sender = random_ip()
+                time.sleep(2)
                 self.send_one_ping(sender,receiver,self.current_socket,data)
         self.current_socket.close()
 
