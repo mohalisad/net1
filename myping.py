@@ -11,9 +11,8 @@ import file_manager as fm
 
 default_timer = time.time
 
-ICMP_ECHO = 8
 ICMP_MAX_RECV = 2048
-HOST_COUNT = 3
+HOST_COUNT = 10
 
 def random_ip():
     return "10.0.0." + str(random.randint(2,HOST_COUNT))
@@ -75,7 +74,7 @@ class MyPing(object):
         ip.set_ip_src(src)
         ip.set_ip_dst(dst)
         icmp = ImpactPacket.ICMP()
-        icmp.set_icmp_type(icmp.ICMP_ECHO)
+        icmp.set_icmp_type(icmp.ICMP_REPLAY)
         icmp.contains(ImpactPacket.Data(icmp_payload))
         ip.contains(icmp)
         icmp.set_icmp_id(0x03)
